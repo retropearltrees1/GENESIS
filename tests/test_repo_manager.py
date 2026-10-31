@@ -7,6 +7,9 @@ from src.repo_manager import (
     search_files,
     copy_file,
     get_file_metadata,
+    backup_file,
+    restore_file,
+    diff_files,
 )
 
 
@@ -55,7 +58,6 @@ def test_copy_file(tmp_path: Path):
     assert copied.exists()
     assert read_file_content(dest) == "important content"
 
-    # Non-existent source should raise FileNotFoundError
     with pytest.raises(FileNotFoundError):
         copy_file(tmp_path / "does_not_exist.txt", tmp_path / "out.txt")
 
@@ -71,3 +73,43 @@ def test_get_file_metadata(tmp_path: Path):
 
     missing_meta = get_file_metadata(tmp_path / "missing.txt")
     assert missing_meta["exists"] is False
+
+
+def test_backup_and_restore_file(tmp_path: Path):
+    original = tmp_path / "doc.txt"
+    create_file(original, "Original state v1")
+    backup_dir = tmp_path / "backups"
+
+    b_path = backup_file(original, backup_dir)
+    assert b_path.exists()
+    assert read_file_content(b_path) == "Original state v1"
+
+    # Modify original file
+    create_file(original, "Modified state v2")
+    assert read_file_content(original) == "Modified state v2"
+
+    # Restore from backup
+    restored = restore_file(b_path, original)
+    assert restored.exists()
+    assert read_file_content(original) == "Original state v1"
+
+
+def test_backup_missing_file_raises(tmp_path: Path):
+    with pytest.raises(FileNotFoundError):
+        backup_file(tmp_path / "none.txt", tmp_path / "backups")
+
+
+def test_restore_missing_file_raises(tmp_path: Path):
+    with pytest.raises(FileNotFoundError):
+        restore_file(tmp_path / "none.bak", tmp_path / "out.txt")
+
+
+def test_diff_files(tmp_path: Path):
+    f1 = tmp_path / "f1.txt"
+    f2 = tmp_path / "f2.txt"
+    create_file(f1, "line 1\nline 2\n")
+    create_file(f2, "line 1\nline 2 modified\n")
+
+    diff = diff_files(f1, f2)
+    assert "-line 2" in diff
+    assert "+line 2 modified" in diff
