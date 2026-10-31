@@ -1,6 +1,6 @@
 # Test_IA
 
-Ce projet fournit des utilitaires modulaires d'interaction et de gestion du dépôt, permettant de manipuler des fichiers (création, lecture, inspection de l'arborescence, recherche, copie et métadonnées) de manière programmable et rigoureusement testée.
+Ce projet fournit des utilitaires modulaires d'interaction et de gestion du dépôt, permettant de manipuler des fichiers (création, lecture, inspection de l'arborescence, recherche, copie, métadonnées, sauvegardes horodatées, restauration et comparaison diff) de manière programmable et rigoureusement testée.
 
 ## Fonctionnalités
 
@@ -11,6 +11,9 @@ Le module `src/repo_manager.py` inclut :
 - `search_files(base_dir, pattern)` : Recherche des fichiers correspondant à un motif glob (ex: `*.py`, `*.md`).
 - `copy_file(src_path, dest_path)` : Copie un fichier vers une destination en gérant l'arborescence cible.
 - `get_file_metadata(filepath)` : Retourne des métadonnées sur un fichier (existence, taille en octets, type).
+- `backup_file(filepath, backup_dir)` : Génère une copie de sauvegarde horodatée (`.bak`) dans un répertoire dédié.
+- `restore_file(backup_path, target_path)` : Restaure un fichier cible depuis une sauvegarde existante.
+- `diff_files(file1, file2)` : Produit un diff unifié entre deux fichiers texte.
 
 ## Structure du projet
 
